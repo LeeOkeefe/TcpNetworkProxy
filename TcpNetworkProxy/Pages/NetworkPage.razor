@@ -1,0 +1,23 @@
+@page "/Network"
+@using TcpNetworkProxy.Data
+@using TcpNetworkProxy.Components
+
+<NetworkListings NetworkEntries="@_networkEntries" OnNetworkEntryClicked="HandleOnClick"/>
+
+@code {
+    private readonly List<NetworkEntry> _networkEntries = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        for (var i = 0; i < 1000; i++)
+        {
+            _networkEntries.Add(new NetworkEntry(TimeOnly.FromDateTime(DateTime.Now), "127.0.0.1", "127.0.0.1", "5E"));
+        }
+    }
+
+    private async Task HandleOnClick(TableRowClickEventArgs<NetworkEntry> eventArgs)
+    {
+        _networkEntries.Add(new NetworkEntry(TimeOnly.FromDateTime(DateTime.Now), "1.1.1.1", "1.1.1.1", "1E"));
+        StateHasChanged();
+    }
+}
