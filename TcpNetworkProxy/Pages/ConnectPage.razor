@@ -1,65 +1,41 @@
 ﻿@page "/"
 
-@using System.Net
-@using TcpNetworkProxy.Data
-
 @inject NavigationManager NavigationManager
 
-<MudForm @ref="_form">
+<EditForm Model="@_model" OnValidSubmit="OnSubmit">
+    <DataAnnotationsValidator/>
     <MudContainer MaxWidth="MaxWidth.Small" Class="d-flex align-center justify-center mud-width-full" style="height:100vh;">
         <MudGrid>
             <MudItem xs="12" sm="8" md="8">
-                <MudTextField @bind-Value="@Proxy.IpAddress" Placeholder="127.0.0.1" Label="Proxy IP"
-                              Variant="Variant.Outlined" Margin="Margin.Dense"
-                              Validation="@(new Func<string, IEnumerable<string>>(IsIpAddressValid))"/>
+                <MudTextField @bind-Value="_model.ProxyHost" For="@(() => _model.ProxyHost)"
+                              Placeholder="127.0.0.1" Label="Proxy Host" Variant="Variant.Outlined" Margin="@FieldMargin"/>
             </MudItem>
             <MudItem xs="12" sm="4" md="4">
-                <MudNumericField @bind-Value="Proxy.Port" Label="Proxy Port" HideSpinButtons
-                                 Variant="Variant.Outlined" Margin="Margin.Dense"
-                                 Min="ushort.MinValue" Max="ushort.MaxValue"/>
+                <MudNumericField @bind-Value="_model.ProxyPort" For="@(() => _model.ProxyPort)"
+                                 Label="Proxy Port" HideSpinButtons Variant="Variant.Outlined" Margin="@FieldMargin"/>
             </MudItem>
             <MudItem xs="12" sm="8" md="8">
-                <MudTextField @bind-Value="Destination.IpAddress" Placeholder="127.0.0.1" Label="Destination IP"
-                              Variant="Variant.Outlined" Margin="Margin.Dense"
-                              Validation="@(new Func<string, IEnumerable<string>>(IsIpAddressValid))"/>
+                <MudTextField @bind-Value="_model.DestinationHost" For="@(() => _model.DestinationHost)"
+                              Placeholder="127.0.0.1" Label="Destination Host" Variant="@FieldVariant" Margin="@FieldMargin"/>
             </MudItem>
             <MudItem xs="12" sm="4" md="4">
-                <MudNumericField @bind-Value="Destination.Port" HideSpinButtons Label="Destination Port"
-                                 Variant="Variant.Outlined" Margin="Margin.Dense"
-                                 Min="ushort.MinValue" Max="ushort.MaxValue"/>
+                <MudNumericField @bind-Value="_model.DestinationPort" For="@(() => _model.DestinationPort)"
+                                 HideSpinButtons Label="Destination Port" Variant="Variant.Outlined" Margin="@FieldMargin"/>
             </MudItem>
             <MudItem xs="12" sm="8" md="8">
-                <MudButton Color="Color.Primary" EndIcon="@Icons.Material.Rounded.PlayArrow" Variant="Variant.Outlined" FullWidth OnClick="@HandleOnClick">
+                <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" EndIcon="@Icons.Material.Rounded.PlayArrow" Variant="@FieldVariant" FullWidth>
                     Capture Traffic
                 </MudButton>
             </MudItem>
         </MudGrid>
     </MudContainer>
-</MudForm>
+</EditForm>
 
 @code {
-    private MudForm _form;
-    
-    private Connection Proxy { get; } = new();
-    private Connection Destination { get; } = new();
+    private const Variant FieldVariant = Variant.Outlined;
+    private const Margin FieldMargin = Margin.Dense;
 
-    private IEnumerable<string> IsIpAddressValid(string input)
-    {
-        if (string.IsNullOrWhiteSpace(input))
-            yield return "Required";
+    private readonly EstablishConnectionViewModel _model = new();
 
-        if (!IPAddress.TryParse(input, out _) || input?.Count(c => c == '.') != 3)
-            yield return "Invalid";
-    }
-
-    private void HandleOnClick()
-    {
-        _form.Validate();
-        if (!_form.IsValid)
-        {
-            return;
-        }
-        
-        NavigationManager.NavigateTo(Paths.Network);   
-    }
+    private void OnSubmit() => NavigationManager.NavigateTo(Paths.Network);
 }
