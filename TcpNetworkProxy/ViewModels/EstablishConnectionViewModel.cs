@@ -7,7 +7,7 @@ public sealed class EstablishConnectionViewModel
 {
     [Display(Name = "proxy host")]
     [Required]
-    [IPAddress(ErrorMessage = "The field {0} must be a valid IP address")]
+    [IpAddress(ErrorMessage = "The field {0} must be a valid IP address")]
     public string ProxyHost { get; set; }
     
     [Display(Name = "proxy port")]
@@ -16,7 +16,7 @@ public sealed class EstablishConnectionViewModel
     
     [Display(Name = "destination host")]
     [Required]
-    [IPAddress(ErrorMessage = "The field {0} must be a valid IP address")]
+    [IpAddress(ErrorMessage = "The field {0} must be a valid IP address")]
     public string DestinationHost { get; set; }
     
     [Display(Name = "destination port")]

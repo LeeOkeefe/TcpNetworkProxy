@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace TcpNetworkProxy.Validators;
 
-public sealed class IPAddressAttribute : ValidationAttribute
+public sealed class IpAddressAttribute : ValidationAttribute
 {
     public override bool IsValid(object value)
     {
