@@ -8,22 +8,22 @@
         <MudGrid>
             <MudItem xs="12" sm="8" md="8">
                 <MudTextField @bind-Value="_model.ProxyHost" For="@(() => _model.ProxyHost)"
-                              Placeholder="127.0.0.1" Label="Proxy Host" Variant="Variant.Outlined" Margin="@FieldMargin"/>
+                              Placeholder="127.0.0.1" Label="Proxy Host" Variant="Variant.Outlined" Margin="@Margin"/>
             </MudItem>
             <MudItem xs="12" sm="4" md="4">
                 <MudNumericField @bind-Value="_model.ProxyPort" For="@(() => _model.ProxyPort)"
-                                 Label="Proxy Port" HideSpinButtons Variant="Variant.Outlined" Margin="@FieldMargin"/>
+                                 Label="Proxy Port" HideSpinButtons Variant="Variant.Outlined" Margin="@Margin"/>
             </MudItem>
             <MudItem xs="12" sm="8" md="8">
                 <MudTextField @bind-Value="_model.DestinationHost" For="@(() => _model.DestinationHost)"
-                              Placeholder="127.0.0.1" Label="Destination Host" Variant="@FieldVariant" Margin="@FieldMargin"/>
+                              Placeholder="127.0.0.1" Label="Destination Host" Variant="@Variant" Margin="@Margin"/>
             </MudItem>
             <MudItem xs="12" sm="4" md="4">
                 <MudNumericField @bind-Value="_model.DestinationPort" For="@(() => _model.DestinationPort)"
-                                 HideSpinButtons Label="Destination Port" Variant="Variant.Outlined" Margin="@FieldMargin"/>
+                                 HideSpinButtons Label="Destination Port" Variant="Variant.Outlined" Margin="@Margin"/>
             </MudItem>
             <MudItem xs="12" sm="8" md="8">
-                <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" EndIcon="@Icons.Material.Rounded.PlayArrow" Variant="@FieldVariant" FullWidth>
+                <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" EndIcon="@Icons.Material.Rounded.PlayArrow" Variant="@Variant" FullWidth>
                     Capture Traffic
                 </MudButton>
             </MudItem>
@@ -32,8 +32,8 @@
 </EditForm>
 
 @code {
-    private const Variant FieldVariant = Variant.Outlined;
-    private const Margin FieldMargin = Margin.Dense;
+    private const Variant Variant = MudBlazor.Variant.Outlined;
+    private const Margin Margin = MudBlazor.Margin.Dense;
 
     private readonly EstablishConnectionViewModel _model = new();
 
