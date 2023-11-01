@@ -1,25 +1,26 @@
 ﻿@page "/"
 
+@inject ConnectionViewModel Model
 @inject NavigationManager NavigationManager
 
-<EditForm Model="@_model" OnValidSubmit="OnSubmit">
+<EditForm Model="@Model" OnValidSubmit="OnSubmit">
     <DataAnnotationsValidator/>
     <MudContainer MaxWidth="MaxWidth.Small" Class="d-flex align-center justify-center mud-width-full" style="height:100vh;">
         <MudGrid>
             <MudItem xs="12" sm="8" md="8">
-                <MudTextField @bind-Value="_model.ProxyHost" For="@(() => _model.ProxyHost)"
+                <MudTextField @bind-Value="Model.ProxyHost" For="@(() => Model.ProxyHost)"
                               Placeholder="127.0.0.1" Label="Proxy Host" Variant="Variant.Outlined" Margin="@Margin"/>
             </MudItem>
             <MudItem xs="12" sm="4" md="4">
-                <MudNumericField @bind-Value="_model.ProxyPort" For="@(() => _model.ProxyPort)"
+                <MudNumericField @bind-Value="Model.ProxyPort" For="@(() => Model.ProxyPort)"
                                  Label="Proxy Port" HideSpinButtons Variant="Variant.Outlined" Margin="@Margin"/>
             </MudItem>
             <MudItem xs="12" sm="8" md="8">
-                <MudTextField @bind-Value="_model.DestinationHost" For="@(() => _model.DestinationHost)"
+                <MudTextField @bind-Value="Model.DestinationHost" For="@(() => Model.DestinationHost)"
                               Placeholder="127.0.0.1" Label="Destination Host" Variant="@Variant" Margin="@Margin"/>
             </MudItem>
             <MudItem xs="12" sm="4" md="4">
-                <MudNumericField @bind-Value="_model.DestinationPort" For="@(() => _model.DestinationPort)"
+                <MudNumericField @bind-Value="Model.DestinationPort" For="@(() => Model.DestinationPort)"
                                  HideSpinButtons Label="Destination Port" Variant="Variant.Outlined" Margin="@Margin"/>
             </MudItem>
             <MudItem xs="12" sm="8" md="8">
@@ -34,8 +35,6 @@
 @code {
     private const Variant Variant = MudBlazor.Variant.Outlined;
     private const Margin Margin = MudBlazor.Margin.Dense;
-
-    private readonly EstablishConnectionViewModel _model = new();
 
     private void OnSubmit() => NavigationManager.NavigateTo(Paths.Network);
 }

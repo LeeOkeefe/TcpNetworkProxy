@@ -3,7 +3,7 @@ using TcpNetworkProxy.Validators;
 
 namespace TcpNetworkProxy.ViewModels;
 
-public sealed class EstablishConnectionViewModel
+public sealed class ConnectionViewModel
 {
     [Display(Name = "proxy host")]
     [Required]
