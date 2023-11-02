@@ -1,1 +1,11 @@
-﻿
+﻿.selected {
+    background-color: #594AE2 !important;
+}
+
+.selected > td {
+    color: white !important;
+}
+
+.selected > td .mud-input {
+    color: white !important;
+}
