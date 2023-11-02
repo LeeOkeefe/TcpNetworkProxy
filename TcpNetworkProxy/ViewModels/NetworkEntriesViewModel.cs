@@ -5,7 +5,6 @@ namespace TcpNetworkProxy.ViewModels;
 
 public sealed class NetworkEntriesViewModel : IDisposable
 {
-    public event Action<NetworkEntryViewModel> OnEntryAdded;
     public ObservableCollection<NetworkEntryViewModel> NetworkEntryViewModels { get; } = new();
     
     private readonly ProxyService _proxyService;
@@ -16,13 +15,14 @@ public sealed class NetworkEntriesViewModel : IDisposable
 
         _proxyService.OnNetworkEntryAdded += UpdateNetworkEntryViewModels;
     }
+
+    public void StartProxyServer(string host, int port, string destinationHost, int destinationPort)
+        => _proxyService.StartProxyServer(host, port, destinationHost, destinationPort);
     
     private void UpdateNetworkEntryViewModels(NetworkEntry entry)
     {
         var model = ToViewModel(entry);
         NetworkEntryViewModels.Add(model);
-        
-        OnEntryAdded?.Invoke(model);
     }
 
     private static NetworkEntryViewModel ToViewModel(NetworkEntry entry)
