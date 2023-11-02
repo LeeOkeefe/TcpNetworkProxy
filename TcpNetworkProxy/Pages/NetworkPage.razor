@@ -1,20 +1,34 @@
-@page "/Network"
+@page "/Network/{host}/{port:int}/{destinationHost}/{destinationPort:int}"
 
 @inject NetworkEntriesViewModel Model
-
+@using System.Collections.Specialized
 @implements IDisposable
 
 <NetworkListings NetworkEntries="@Model.NetworkEntryViewModels" OnNetworkEntryClicked="@HandleOnClick"/>
 
 @code {
+    [Parameter] public string Host { get; set; }
+    [Parameter] public int Port { get; set; }
+    [Parameter] public string DestinationHost { get; set; }
+    [Parameter] public int DestinationPort { get; set; }
 
-    protected override void OnInitialized() => Model.OnEntryAdded += OnEntryAdded;
-    private void OnEntryAdded(NetworkEntryViewModel entry) => StateHasChanged();
-    public void Dispose() => Model.OnEntryAdded -= OnEntryAdded;
+    private async void UpdateState(object obj, NotifyCollectionChangedEventArgs args) => await InvokeAsync(StateHasChanged);
+    
+    protected override void OnInitialized()
+    {
+        Model.NetworkEntryViewModels.CollectionChanged += UpdateState;
+
+        Model.StartProxyServer(Host, Port, DestinationHost, DestinationPort);
+    }
 
     private async Task HandleOnClick(TableRowClickEventArgs<NetworkEntryViewModel> eventArgs)
     {
         // TODO:
         // Open / populate packet editor, inspector etc.
+    }
+
+    public void Dispose()
+    {
+        Model.NetworkEntryViewModels.CollectionChanged -= UpdateState;
     }
 }
