@@ -36,5 +36,5 @@
     private const Variant Variant = MudBlazor.Variant.Outlined;
     private const Margin Margin = MudBlazor.Margin.Dense;
 
-    private void OnSubmit() => NavigationManager.NavigateTo(Paths.Network);
+    private void OnSubmit() => NavigationManager.NavigateTo(Paths.Network(Model.ProxyHost, Model.ProxyPort, Model.DestinationHost, Model.DestinationPort));
 }
