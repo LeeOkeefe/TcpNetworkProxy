@@ -9,21 +9,21 @@ public sealed class ProxyService
 
     private readonly CancellationTokenSource _cts = new();
 
-    private string _proxyHost;
-    private string _destinationHost;
+    private Connection _proxy;
+    private Connection _destination;
     
-    public async void StartProxyServer(string host, int port, string destinationHost, int destinationPort)
+    public async void StartProxyServer(Connection proxy, Connection destination)
     {
-        _proxyHost = host ?? throw new ArgumentNullException(nameof(host));
-        _destinationHost = destinationHost ?? throw new ArgumentNullException(nameof(destinationHost));
+        _proxy = proxy ?? throw new ArgumentNullException(nameof(proxy));
+        _destination = destination ?? throw new ArgumentNullException(nameof(destination));
         
-        var listener = new TcpListener(IPAddress.Parse(host), port);
+        var listener = new TcpListener(IPAddress.Parse(proxy.Host), proxy.Port);
         listener.Start();
 
         while (!_cts.IsCancellationRequested)
         {
             var incomingClient = await listener.AcceptTcpClientAsync();
-            var outgoingClient = new TcpClient(destinationHost, destinationPort);
+            var outgoingClient = new TcpClient(destination.Host, destination.Port);
             
             _ = Task.Run(() => HandleClientAsync(incomingClient, outgoingClient));
         }
@@ -36,13 +36,13 @@ public sealed class ProxyService
         await using var incomingStream = incomingClient.GetStream();
         await using var outgoingStream = outgoingClient.GetStream();
         
-        var incomingToOutgoing = ForwardDataAsync(incomingStream, outgoingStream, _proxyHost, _destinationHost);
-        var outgoingToIncoming = ForwardDataAsync(outgoingStream, incomingStream, _destinationHost, _proxyHost);
+        var incomingToOutgoing = ForwardDataAsync(incomingStream, outgoingStream, _proxy, _destination);
+        var outgoingToIncoming = ForwardDataAsync(outgoingStream, incomingStream, _destination, _proxy);
         
         await Task.WhenAll(incomingToOutgoing, outgoingToIncoming);
     }
     
-    private async Task ForwardDataAsync(Stream fromStream, Stream toStream, string source, string destination)
+    private async Task ForwardDataAsync(Stream fromStream, Stream toStream, Connection source, Connection destination)
     {
         var buffer = new byte[1024];
         int bytesRead;
@@ -53,7 +53,7 @@ public sealed class ProxyService
             await toStream.FlushAsync();
 
             var data = BitConverter.ToString(buffer, 0, bytesRead);
-            var entry = new NetworkEntry(TimeOnly.FromDateTime(DateTime.Now), source, destination, data);
+            var entry = new NetworkEntry(TimeOnly.FromDateTime(DateTime.Now), source.Host, destination.Host, data);
             
             OnNetworkEntryAdded?.Invoke(entry);
         }

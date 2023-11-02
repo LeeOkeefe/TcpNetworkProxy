@@ -17,7 +17,12 @@ public sealed class NetworkEntriesViewModel : IDisposable
     }
 
     public void StartProxyServer(string host, int port, string destinationHost, int destinationPort)
-        => _proxyService.StartProxyServer(host, port, destinationHost, destinationPort);
+    {
+        var proxy = new Connection(host, port);
+        var destination = new Connection(destinationHost, destinationPort);
+        
+        _proxyService.StartProxyServer(proxy, destination);
+    }
     
     private void UpdateNetworkEntryViewModels(NetworkEntry entry)
     {
