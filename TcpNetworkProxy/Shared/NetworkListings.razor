@@ -1,8 +1,6 @@
 @using TcpNetworkProxy.Data
 
-@inject IJSRuntime JsRuntime
-
-<MudTable RowClass="cursor-pointer" Height="500px" Items="@NetworkEntries.Reverse()" Hover Dense Breakpoint="Breakpoint.Sm" OnRowClick="@OnNetworkEntryClicked" Virtualize>
+<MudTable Items="@NetworkEntries.Reverse()" OnRowClick="@OnNetworkEntryClicked" RowClass="cursor-pointer" Height="500px" Virtualize Hover Dense>
     <HeaderContent>
         <MudTh>Timestamp</MudTh>
         <MudTh>Source</MudTh>
@@ -19,8 +17,8 @@
 
 @code {
     [Parameter]
-    public IReadOnlyCollection<NetworkEntry> NetworkEntries { get; set; } = Array.Empty<NetworkEntry>();
+    public IReadOnlyCollection<NetworkEntryViewModel> NetworkEntries { get; set; }
 
     [Parameter]
-    public EventCallback<TableRowClickEventArgs<NetworkEntry>> OnNetworkEntryClicked { get; set; }
+    public EventCallback<TableRowClickEventArgs<NetworkEntryViewModel>> OnNetworkEntryClicked { get; set; }
 }

@@ -1,4 +1,4 @@
-﻿using MudBlazor.Services;
+﻿using TcpNetworkProxy.Extensions;
 
 namespace TcpNetworkProxy;
 
@@ -13,12 +13,10 @@ public static class MauiProgram
 			{
 				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
 			});
-
-#if DEBUG
-		builder.Services.AddBlazorWebViewDeveloperTools();
-#endif
-		builder.Services.AddMudServices();
-		builder.Services.AddMauiBlazorWebView();
+        
+		builder.Services
+			.AddViewModels()
+			.AddServices();
 
 		return builder.Build();
 	}
