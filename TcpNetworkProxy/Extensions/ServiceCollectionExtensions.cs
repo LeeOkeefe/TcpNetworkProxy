@@ -1,4 +1,5 @@
 using MudBlazor.Services;
+using TcpNetworkProxy.Data;
 using TcpNetworkProxy.ViewModels;
 
 namespace TcpNetworkProxy.Extensions;
@@ -9,6 +10,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddTransient<ConnectionViewModel>();
         services.AddTransient<NetworkEntryViewModel>();
+        services.AddTransient<NetworkEntriesViewModel>();
 
         return services;
     }
@@ -20,6 +22,7 @@ public static class ServiceCollectionExtensions
 #endif
         services.AddMudServices();
         services.AddMauiBlazorWebView();
+        services.AddSingleton<ProxyService>();
 
         return services;
     }
