@@ -4,7 +4,7 @@
 @implements IDisposable
 
 
-<NetworkListings NetworkEntries="@Model.GetNetworkEntries()" OnNetworkEntryClicked="@HandleOnClick"/>
+<NetworkListings NetworkEntries="@Model.GetNetworkEntriesSnapshot()" OnNetworkEntryClicked="@HandleOnClick"/>
 
 @code {
     [Parameter] public string Host { get; set; }

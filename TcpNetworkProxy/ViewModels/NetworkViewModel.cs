@@ -36,7 +36,7 @@ public sealed class NetworkViewModel : IDisposable
         _proxyService.StartProxyServer(proxy, destination);
     }
 
-    public IReadOnlyList<NetworkEntryViewModel> GetNetworkEntries()
+    public IReadOnlyList<NetworkEntryViewModel> GetNetworkEntriesSnapshot()
     {
         lock (_displayEntries)
         {
@@ -54,12 +54,9 @@ public sealed class NetworkViewModel : IDisposable
         }
 
         var viewModels = entriesToProcess.Select(e => e.ToViewModel());
-        foreach (var model in viewModels)
+        lock (_displayEntries)
         {
-            lock (_displayEntries)
-            {
-                _displayEntries.Add(model);
-            }
+            _displayEntries.AddRange(viewModels);
         }
     }
     
