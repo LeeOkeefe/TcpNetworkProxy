@@ -1,0 +1,97 @@
+using TcpNetworkProxy.Data;
+using TcpNetworkProxy.Extensions;
+
+namespace TcpNetworkProxy.ViewModels;
+
+public sealed class NetworkViewModel : IDisposable
+{
+    private readonly List<NetworkEntryViewModel> _displayEntries = new();
+    private readonly List<NetworkEntry> _pendingEntries = new();
+    private readonly ProxyService _proxyService;
+    private readonly System.Timers.Timer _updateTimer;
+    public event Action OnUpdateRequested;
+    
+    public NetworkViewModel(ProxyService proxyService)
+    {
+        _proxyService = proxyService;
+        _proxyService.OnNetworkDataSent += OnNetworkDataSent;
+        
+        _updateTimer = new System.Timers.Timer(100);
+        _updateTimer.Elapsed += (_, _) =>
+        {
+            ProcessPendingEntries();
+            ScheduleEntriesRemoval();
+        };
+        _updateTimer.Start();
+    }
+
+    private void ScheduleEntriesRemoval()
+    {
+        if (_displayEntries.Count < 100)
+        {
+            return;
+        }
+
+        lock (_displayEntries)
+        {
+            _displayEntries.RemoveRange(0, _displayEntries.Count - 100);
+        }
+    }
+
+    public void StartProxyServer(string host, int port, string destinationHost, int destinationPort)
+    {
+        var proxy = new Connection(host, port);
+        var destination = new Connection(destinationHost, destinationPort);
+        
+        _proxyService.StartProxyServer(proxy, destination);
+    }
+
+    public IReadOnlyList<NetworkEntryViewModel> GetNetworkEntries()
+    {
+        lock (_displayEntries)
+        {
+            return _displayEntries.ToArray();
+        }
+    }
+    
+    private void ProcessPendingEntries()
+    {
+        List<NetworkEntry> entriesToProcess;
+        lock (_pendingEntries)
+        {
+            entriesToProcess = new List<NetworkEntry>(_pendingEntries);
+            _pendingEntries.Clear();
+        }
+
+        var viewModels = entriesToProcess.Select(e => e.ToViewModel());
+        foreach (var model in viewModels)
+        {
+            lock (_displayEntries)
+            {
+                _displayEntries.Add(model);
+            }
+        }
+        OnUpdateRequested?.Invoke();
+    }
+    
+    private void OnNetworkDataSent(NetworkEntry networkEntry)
+    {
+        lock (_pendingEntries)
+        {
+            _pendingEntries.Add(networkEntry);
+        }
+    }
+
+    public void Dispose()
+    {
+        _proxyService.OnNetworkDataSent -= OnNetworkDataSent;
+        
+        if (_updateTimer == null)
+        {
+            return;
+        }
+        
+        _updateTimer.Stop();
+        _updateTimer.Dispose();
+    }
+}

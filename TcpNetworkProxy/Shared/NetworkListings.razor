@@ -1,52 +1,54 @@
 @using TcpNetworkProxy.Data
+@using TcpNetworkProxy.Extensions
 
-<MudTable Items="@NetworkEntries.Reverse()" OnRowClick="@OnNetworkEntryClicked" RowClassFunc="@SelectedRowClassFunc"
-          @ref="_mudTable" RowClass="cursor-pointer" Height="650px" Virtualize Hover Dense>
+@inject NetworkViewModel Model
+@inject IJSRuntime JsRuntime
+
+<MudTable Items="@NetworkEntries" OnRowClick="@OnNetworkEntryClicked" RowClassFunc="@SelectedRowClassFunc"
+          @ref="_mudTable" RowClass="cursor-pointer" Height="650px"
+          Virtualize Hover Dense FixedHeader>
     <ColGroup>
-        <col style="max-width: 300px"/>
-        <col style="max-width: 300px"/>
-        <col style="max-width: 300px"/>
-        <col style="min-width: 300px"/>
+        <col/>
+        <col/>
+        <col/>
+        <col style="width: 50px;"/>
+        <col/>
     </ColGroup>
     <HeaderContent>
-        <MudTh>Timestamp</MudTh>
+        <MudTh>
+            <MudTableSortLabel
+                SortBy="@(new Func<NetworkEntryViewModel, object>(n => n.Timestamp))"
+                InitialDirection="SortDirection.Descending">
+                Timestamp
+            </MudTableSortLabel>
+        </MudTh>
         <MudTh>Source</MudTh>
         <MudTh>Destination</MudTh>
-        <MudTh>Data</MudTh>
+        <MudTh>Data Size</MudTh>
+        <MudTh>Data Preview</MudTh>
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="Timestamp">@context.Timestamp.ToLongTimeString()</MudTd>
         <MudTd DataLabel="Source">@context.Source</MudTd>
         <MudTd DataLabel="Destination">@context.Destination</MudTd>
-        <MudTd DataLabel="Data">@context.Data</MudTd>
+        <MudTd DataLabel="Data Size">@context.DataSize</MudTd>
+        <MudTd DataLabel="Data Preview">@context.DataPreview</MudTd>
     </RowTemplate>
 </MudTable>
 
 @code {
+
     [Parameter]
-    public IReadOnlyCollection<NetworkEntryViewModel> NetworkEntries { get; set; }
+    public IReadOnlyList<NetworkEntryViewModel> NetworkEntries { get; set; }
 
     [Parameter]
     public EventCallback<TableRowClickEventArgs<NetworkEntryViewModel>> OnNetworkEntryClicked { get; set; }
 
     private MudTable<NetworkEntryViewModel> _mudTable;
-    private int _selectedRowNumber = -1;
 
     private string SelectedRowClassFunc(NetworkEntryViewModel element, int rowNumber)
     {
-        if (_selectedRowNumber == rowNumber)
-        {
-            _selectedRowNumber = -1;
-            return string.Empty;
-        }
-
-        if (_mudTable.SelectedItem == null || !_mudTable.SelectedItem.Equals(element))
-        {
-            return string.Empty;
-        }
-
-        _selectedRowNumber = rowNumber;
-        return "selected";
+        return _mudTable.SelectedItem == element ? "selected" : string.Empty;
     }
 
 }
