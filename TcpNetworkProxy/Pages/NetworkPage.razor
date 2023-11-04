@@ -4,13 +4,22 @@
 @implements IDisposable
 
 
-<NetworkListings NetworkEntries="@Model.GetNetworkEntriesSnapshot()" OnNetworkEntryClicked="@HandleOnClick"/>
+<MudGrid>
+    <MudItem md="12">
+        <NetworkListings NetworkEntries="@Model.GetNetworkEntriesSnapshot()" OnNetworkEntryClicked="@HandleOnClick"/>
+    </MudItem>
+    <MudItem md="6">
+        <PacketIdentifier HexString="@_selectedNetworkEntry.Data"/>
+    </MudItem>
+</MudGrid>
 
 @code {
     [Parameter] public string Host { get; set; }
     [Parameter] public int Port { get; set; }
     [Parameter] public string DestinationHost { get; set; }
     [Parameter] public int DestinationPort { get; set; }
+
+    private NetworkEntryViewModel _selectedNetworkEntry = new();
     
     protected override void OnInitialized()
     {
@@ -26,9 +35,8 @@
 
     private async void InvokeStateChangedAsync() => await InvokeAsync(StateHasChanged);
     
-    private async Task HandleOnClick(TableRowClickEventArgs<NetworkEntryViewModel> eventArgs)
+    private void HandleOnClick(TableRowClickEventArgs<NetworkEntryViewModel> eventArgs)
     {
-        // TODO:
-        // Open / populate packet editor, inspector etc.
+        _selectedNetworkEntry = eventArgs.Item;
     }
 }
