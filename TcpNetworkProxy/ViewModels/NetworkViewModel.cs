@@ -10,32 +10,22 @@ public sealed class NetworkViewModel : IDisposable
     private readonly ProxyService _proxyService;
     private readonly System.Timers.Timer _updateTimer;
     public event Action OnUpdateRequested;
+
+    private const int MaxNetworkEntries = 100;
     
     public NetworkViewModel(ProxyService proxyService)
     {
         _proxyService = proxyService;
         _proxyService.OnNetworkDataSent += OnNetworkDataSent;
         
-        _updateTimer = new System.Timers.Timer(100);
+        _updateTimer = new System.Timers.Timer(150);
         _updateTimer.Elapsed += (_, _) =>
         {
             ProcessPendingEntries();
-            ScheduleEntriesRemoval();
+            PruneNetworkEntries();
+            OnUpdateRequested?.Invoke();
         };
         _updateTimer.Start();
-    }
-
-    private void ScheduleEntriesRemoval()
-    {
-        if (_displayEntries.Count < 100)
-        {
-            return;
-        }
-
-        lock (_displayEntries)
-        {
-            _displayEntries.RemoveRange(0, _displayEntries.Count - 100);
-        }
     }
 
     public void StartProxyServer(string host, int port, string destinationHost, int destinationPort)
@@ -71,7 +61,19 @@ public sealed class NetworkViewModel : IDisposable
                 _displayEntries.Add(model);
             }
         }
-        OnUpdateRequested?.Invoke();
+    }
+    
+    private void PruneNetworkEntries()
+    {
+        if (_displayEntries.Count < MaxNetworkEntries)
+        {
+            return;
+        }
+
+        lock (_displayEntries)
+        {
+            _displayEntries.RemoveRange(0, _displayEntries.Count - MaxNetworkEntries);
+        }
     }
     
     private void OnNetworkDataSent(NetworkEntry networkEntry)
