@@ -6,6 +6,10 @@
             <MudSelectItem Value="@(new DataTypeViewModel { TypeName = nameof(Int32), SizeInBytes = sizeof(int) })" />
             <MudSelectItem Value="@(new DataTypeViewModel { TypeName = nameof(Int64), SizeInBytes = sizeof(long) })" />
         </MudSelect>
+        @if (HexString is not null)
+        {
+            <PacketIdentifierToolbar/>
+        }
         <ByteSelector DataType="_selectedDataType" HexString="@HexString"/>
     </MudCardContent>
 </MudCard>
