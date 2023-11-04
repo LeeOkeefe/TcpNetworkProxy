@@ -1,0 +1,12 @@
+.hex-byte {
+    padding: 4px;
+    margin: 2px;
+    display: inline-block;
+    cursor: pointer;
+    user-select: none;
+}
+
+.hex-byte.highlighted {
+    border: 1px solid #594AE2;
+    background: rgba(89, 74, 226, 0.33);
+}
