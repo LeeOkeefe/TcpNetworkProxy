@@ -1,63 +1,81 @@
 @using System.ComponentModel
 
-<div class="hex-string">
-    @foreach (var hexByte in _hexBytes)
-    {
-        <span class="hex-byte @(hexByte.IsSelected ? "highlighted" : string.Empty)"
-              @onclick="() => SelectBytes(hexByte)">
-            @hexByte.Value
-        </span>
-    }
-</div>
+@if (_hexBytes.Count == 0)
+{
+    <MudText>No packet selected.</MudText>
+}
+else
+{
+    <div class="hex-string">
+        @foreach (var hexByte in _hexBytes)
+        {
+            <span class="hex-byte @(hexByte.IsSelected ? "highlighted" : string.Empty)"
+                  @onclick="() => SelectBytes(hexByte)">
+                @hexByte.Value
+            </span>
+        }
+    </div>
+}
 
 @code {
 
-    [Parameter] public DataTypeViewModel DataType { get; set; }
-    [Parameter] public string HexString { get; set; }
+    [Parameter]
+    public DataTypeViewModel DataType { get; set; }
 
-    private List<HexByteViewModel> _hexBytes;
-    private int _selectedHexIndexStart;
-    
-    protected override void OnInitialized()
-    {
-        _hexBytes = HexString.Split(" ").Select((h, i) => 
-            new HexByteViewModel { Index = i, Value = h, IsSelected = false }).ToList();
-    }
-    
+    [Parameter]
+    public string HexString { get; set; }
+
+    private List<HexByteViewModel> _hexBytes = new();
+    private int _selectedByteIndex;
+
     protected override void OnParametersSet()
     {
-        SelectBytes(_hexBytes[_selectedHexIndexStart]);
+        ResetByteSelection();
+
+        if (HexString is null)
+            return;
+
+        _hexBytes = GetHexBytes(HexString);
+        var bytes = _hexBytes[_selectedByteIndex];
+        SelectBytes(bytes);
+    }
+
+    private List<HexByteViewModel> GetHexBytes(string hexString)
+    {
+        return hexString.Split(" ").Select((h, i) =>
+            new HexByteViewModel { Index = i, Value = h, IsSelected = false }).ToList();
     }
 
     private void SelectBytes(HexByteViewModel hexByteViewModel)
     {
-        ResetSelection();
+        ResetByteSelection();
 
         if (DataType == null)
         {
             return;
         }
-        
-        _selectedHexIndexStart = hexByteViewModel.Index;
+
+        _selectedByteIndex = hexByteViewModel.Index;
         var hexIndexRange = hexByteViewModel.Index + DataType.SizeInBytes;
         if (hexIndexRange > _hexBytes.Count)
         {
             return;
         }
-        
+
         for (var i = hexByteViewModel.Index; i < hexIndexRange; i++)
         {
             _hexBytes[i].IsSelected = true;
         }
     }
 
-    private void ResetSelection()
+    private void ResetByteSelection()
     {
-        _selectedHexIndexStart = 0;
+        _selectedByteIndex = 0;
 
         foreach (var hex in _hexBytes.Where(hex => hex.IsSelected))
         {
             hex.IsSelected = false;
         }
     }
+
 }
