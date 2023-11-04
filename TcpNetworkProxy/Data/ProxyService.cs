@@ -5,7 +5,7 @@ namespace TcpNetworkProxy.Data;
 
 public sealed class ProxyService
 {
-    public event Action<NetworkEntry> OnNetworkEntryAdded;
+    public event Action<NetworkEntry> OnNetworkDataSent;
 
     private readonly CancellationTokenSource _cts = new();
 
@@ -55,7 +55,7 @@ public sealed class ProxyService
             var data = BitConverter.ToString(buffer, 0, bytesRead);
             var entry = new NetworkEntry(TimeOnly.FromDateTime(DateTime.Now), source.Host, destination.Host, data);
             
-            OnNetworkEntryAdded?.Invoke(entry);
+            OnNetworkDataSent?.Invoke(entry);
         }
     }
 }

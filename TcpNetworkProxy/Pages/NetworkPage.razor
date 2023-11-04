@@ -1,35 +1,34 @@
 @page "/Network/{host}/{port:int}/{destinationHost}/{destinationPort:int}"
 
-@inject NetworkEntriesViewModel Model
-@using System.Collections.Specialized
+@inject NetworkViewModel Model
 @implements IDisposable
 
 
-<NetworkListings NetworkEntries="@Model.NetworkEntryViewModels" OnNetworkEntryClicked="@HandleOnClick"/>
+<NetworkListings NetworkEntries="@Model.GetNetworkEntriesSnapshot()" OnNetworkEntryClicked="@HandleOnClick"/>
 
 @code {
     [Parameter] public string Host { get; set; }
     [Parameter] public int Port { get; set; }
     [Parameter] public string DestinationHost { get; set; }
     [Parameter] public int DestinationPort { get; set; }
-
-    private async void UpdateState(object obj, NotifyCollectionChangedEventArgs args) => await InvokeAsync(StateHasChanged);
     
     protected override void OnInitialized()
     {
-        Model.NetworkEntryViewModels.CollectionChanged += UpdateState;
-
         Model.StartProxyServer(Host, Port, DestinationHost, DestinationPort);
-    }
-
-    private async Task HandleOnClick(TableRowClickEventArgs<NetworkEntryViewModel> eventArgs)
-    {
-        // TODO:
-        // Open / populate packet editor, inspector etc.
+        Model.OnUpdateRequested += InvokeStateChangedAsync;
     }
 
     public void Dispose()
     {
-        Model.NetworkEntryViewModels.CollectionChanged -= UpdateState;
+        Model.OnUpdateRequested -= InvokeStateChangedAsync;
+        Model.Dispose();
+    }
+
+    private async void InvokeStateChangedAsync() => await InvokeAsync(StateHasChanged);
+    
+    private async Task HandleOnClick(TableRowClickEventArgs<NetworkEntryViewModel> eventArgs)
+    {
+        // TODO:
+        // Open / populate packet editor, inspector etc.
     }
 }

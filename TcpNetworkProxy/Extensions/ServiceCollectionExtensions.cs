@@ -10,7 +10,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddTransient<ConnectionViewModel>();
         services.AddTransient<NetworkEntryViewModel>();
-        services.AddTransient<NetworkEntriesViewModel>();
+        services.AddTransient<NetworkViewModel>();
 
         return services;
     }
