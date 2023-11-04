@@ -1,6 +1,6 @@
 <MudCard>
     <MudCardContent>
-        <MudSelect T="DataTypeViewModel" @bind-Value="@_selectedDataType" ToStringFunc="@_converter" Label="Select data type" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Outlined" Class="my-5">
+        <MudSelect T="DataTypeViewModel" @bind-Value="@_selectedDataType" ToStringFunc="@_getDataTypeName" Label="Select data type" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Outlined" Class="my-5">
             <MudSelectItem Value="@(new DataTypeViewModel { TypeName = nameof(Byte), SizeInBytes = sizeof(byte) })" />
             <MudSelectItem Value="@(new DataTypeViewModel { TypeName = nameof(Int16), SizeInBytes = sizeof(short) })" />
             <MudSelectItem Value="@(new DataTypeViewModel { TypeName = nameof(Int32), SizeInBytes = sizeof(int) })" />
@@ -16,5 +16,5 @@
 
     private DataTypeViewModel _selectedDataType;
     
-    Func<DataTypeViewModel,string> _converter = d => d?.TypeName;
+    Func<DataTypeViewModel, string> _getDataTypeName = dataType => dataType?.TypeName;
 }
