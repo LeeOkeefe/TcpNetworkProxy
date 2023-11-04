@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using TcpNetworkProxy.Data;
 using TcpNetworkProxy.Extensions;
 
@@ -5,12 +6,13 @@ namespace TcpNetworkProxy.ViewModels;
 
 public sealed class NetworkViewModel : IDisposable
 {
-    private readonly List<NetworkEntryViewModel> _displayEntries = new();
+    public IReadOnlyList<NetworkEntryViewModel> GetNetworkEntriesSnapshot() => _displayEntries;
+    public event Action OnUpdateRequested;
+
+    private ImmutableList<NetworkEntryViewModel> _displayEntries = ImmutableList<NetworkEntryViewModel>.Empty;
     private readonly List<NetworkEntry> _pendingEntries = new();
     private readonly ProxyService _proxyService;
     private readonly System.Timers.Timer _updateTimer;
-    public event Action OnUpdateRequested;
-
     private const int MaxNetworkEntries = 100;
     
     public NetworkViewModel(ProxyService proxyService)
@@ -18,7 +20,7 @@ public sealed class NetworkViewModel : IDisposable
         _proxyService = proxyService;
         _proxyService.OnNetworkDataSent += OnNetworkDataSent;
         
-        _updateTimer = new System.Timers.Timer(150);
+        _updateTimer = new System.Timers.Timer(200);
         _updateTimer.Elapsed += (_, _) =>
         {
             ProcessPendingEntries();
@@ -35,14 +37,6 @@ public sealed class NetworkViewModel : IDisposable
         
         _proxyService.StartProxyServer(proxy, destination);
     }
-
-    public IReadOnlyList<NetworkEntryViewModel> GetNetworkEntriesSnapshot()
-    {
-        lock (_displayEntries)
-        {
-            return _displayEntries.ToArray();
-        }
-    }
     
     private void ProcessPendingEntries()
     {
@@ -54,10 +48,7 @@ public sealed class NetworkViewModel : IDisposable
         }
 
         var viewModels = entriesToProcess.Select(e => e.ToViewModel());
-        lock (_displayEntries)
-        {
-            _displayEntries.AddRange(viewModels);
-        }
+        _displayEntries = _displayEntries.AddRange(viewModels);
     }
     
     private void PruneNetworkEntries()
@@ -66,11 +57,8 @@ public sealed class NetworkViewModel : IDisposable
         {
             return;
         }
-
-        lock (_displayEntries)
-        {
-            _displayEntries.RemoveRange(0, _displayEntries.Count - MaxNetworkEntries);
-        }
+        
+        _displayEntries = _displayEntries.RemoveRange(0, _displayEntries.Count - MaxNetworkEntries);
     }
     
     private void OnNetworkDataSent(NetworkEntry networkEntry)
