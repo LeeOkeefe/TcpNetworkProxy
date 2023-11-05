@@ -52,7 +52,9 @@ public sealed class ProxyService
             await toStream.WriteAsync(buffer.AsMemory(0, bytesRead));
             await toStream.FlushAsync();
 
-            var data = BitConverter.ToString(buffer, 0, bytesRead);
+            var data = new byte[bytesRead];
+            Array.Copy(buffer, data, bytesRead);
+            
             var entry = new NetworkEntry(TimeOnly.FromDateTime(DateTime.Now), source.Host, destination.Host, data);
             
             OnNetworkDataSent?.Invoke(entry);

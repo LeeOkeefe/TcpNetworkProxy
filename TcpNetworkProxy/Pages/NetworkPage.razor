@@ -1,6 +1,7 @@
 @page "/Network/{host}/{port:int}/{destinationHost}/{destinationPort:int}"
 
 @inject NetworkViewModel Model
+@using TcpNetworkProxy.Extensions
 @implements IDisposable
 
 
@@ -9,7 +10,7 @@
         <NetworkListings NetworkEntries="@Model.GetNetworkEntriesSnapshot()" OnNetworkEntryClicked="@HandleOnClick"/>
     </MudItem>
     <MudItem md="6">
-        <PacketIdentifier HexString="@_selectedNetworkEntry.Data"/>
+        <PacketIdentifier HexString="@_selectedNetworkEntry.Data.ToHexadecimalString()"/>
     </MudItem>
 </MudGrid>
 
