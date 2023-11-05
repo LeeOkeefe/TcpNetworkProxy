@@ -1,17 +1,18 @@
 @using System.ComponentModel
+@using TcpNetworkProxy.Extensions
 
-@if (_hexBytes.Count == 0)
+@if (NetworkEntry is null)
 {
-    <MudText>No packet selected.</MudText>
+    <MudText>No network packet selected.</MudText>
 }
 else
 {
     <div class="hex-string">
-        @foreach (var hexByte in _hexBytes)
+        @foreach (var hex in _hexadecimals)
         {
-            <span class="hex-byte @(hexByte.IsSelected ? "highlighted" : string.Empty)"
-                  @onclick="() => SelectBytes(hexByte)">
-                @hexByte.Value
+            <span class="hex-byte @(hex.IsSelected ? "highlighted" : string.Empty)"
+                  @onclick="() => SelectBytes(hex)">
+                @hex.ToString()
             </span>
         }
     </div>
@@ -20,38 +21,41 @@ else
 @code {
 
     [Parameter]
+    public EventCallback<IReadOnlyCollection<HexadecimalViewModel>> OnBytesSelected { get; set; }
+
+    [Parameter]
     public DataTypeViewModel DataType { get; set; }
 
     [Parameter]
-    public string HexString { get; set; }
+    public NetworkEntryViewModel NetworkEntry { get; set; }
 
-    private List<HexByteViewModel> _hexBytes = new();
+    private List<HexadecimalViewModel> _hexadecimals = new();
     private int _selectedByteIndex;
 
+    private Type _previousDataType;
+    private string _previousHexString;
+    
     protected override void OnParametersSet()
     {
-        if (HexString is null)
+        if (NetworkEntry is null || _previousHexString == NetworkEntry.Data.ToHexadecimalString() && _previousDataType == DataType?.Type)
         {
             return;
         }
+        
+        _hexadecimals = NetworkEntry.Data.Select((b, i) => new HexadecimalViewModel { Index = i, Byte = b, IsSelected = false }).ToList();
 
-        if (_selectedByteIndex < _hexBytes.Count | _selectedByteIndex > _hexBytes.Count)
+        if (_selectedByteIndex > _hexadecimals.Count)
         {
             ResetByteSelection(); 
         }
 
-        _hexBytes = GetHexBytes(HexString);
-        var bytes = _hexBytes[_selectedByteIndex];
-        SelectBytes(bytes);
+        SelectBytes(_hexadecimals[_selectedByteIndex]);
+        
+        _previousDataType = DataType?.Type;
+        _previousHexString = NetworkEntry.Data.ToHexadecimalString();
     }
 
-    private List<HexByteViewModel> GetHexBytes(string hexString)
-    {
-        return hexString.Split(" ").Select((h, i) =>
-            new HexByteViewModel { Index = i, Value = h, IsSelected = false }).ToList();
-    }
-
-    private void SelectBytes(HexByteViewModel hexByteViewModel)
+    private void SelectBytes(HexadecimalViewModel hexadecimalViewModel)
     {
         ResetByteSelection();
 
@@ -60,26 +64,38 @@ else
             return;
         }
 
-        _selectedByteIndex = hexByteViewModel.Index;
-        var hexIndexRange = hexByteViewModel.Index + DataType.SizeInBytes;
-        if (hexIndexRange > _hexBytes.Count)
+        _selectedByteIndex = hexadecimalViewModel.Index;
+        var hexIndexRange = hexadecimalViewModel.Index + DataType.SizeInBytes;
+        if (hexIndexRange > _hexadecimals.Count)
         {
+            HandleOnBytesSelected(null);
             return;
         }
 
-        for (var i = hexByteViewModel.Index; i < hexIndexRange; i++)
+        for (var i = hexadecimalViewModel.Index; i < hexIndexRange; i++)
         {
-            _hexBytes[i].IsSelected = true;
+            _hexadecimals[i].IsSelected = true;
         }
+
+        var selectedHexBytes = _hexadecimals.Where(h => h.IsSelected).ToArray();
+        HandleOnBytesSelected(selectedHexBytes);
     }
 
     private void ResetByteSelection()
     {
         _selectedByteIndex = 0;
 
-        foreach (var hex in _hexBytes.Where(hex => hex.IsSelected))
+        foreach (var hex in _hexadecimals.Where(hex => hex.IsSelected))
         {
             hex.IsSelected = false;
+        }
+    }
+
+    private void HandleOnBytesSelected(HexadecimalViewModel[] bytes)
+    {
+        if (OnBytesSelected.HasDelegate)
+        {
+            OnBytesSelected.InvokeAsync(bytes);
         }
     }
 

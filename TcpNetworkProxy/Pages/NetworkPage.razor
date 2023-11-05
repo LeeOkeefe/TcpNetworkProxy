@@ -9,7 +9,7 @@
         <NetworkListings NetworkEntries="@Model.GetNetworkEntriesSnapshot()" OnNetworkEntryClicked="@HandleOnClick"/>
     </MudItem>
     <MudItem md="6">
-        <PacketIdentifier HexString="@_selectedNetworkEntry.Data"/>
+        <PacketIdentifier SelectedNetworkEntry="@_selectedNetworkEntry"/>
     </MudItem>
 </MudGrid>
 
@@ -19,7 +19,7 @@
     [Parameter] public string DestinationHost { get; set; }
     [Parameter] public int DestinationPort { get; set; }
 
-    private NetworkEntryViewModel _selectedNetworkEntry = new();
+    private NetworkEntryViewModel _selectedNetworkEntry;
     
     protected override void OnInitialized()
     {

@@ -31,8 +31,8 @@
         <MudTd DataLabel="Timestamp">@context.Timestamp.ToLongTimeString()</MudTd>
         <MudTd DataLabel="Source">@context.Source</MudTd>
         <MudTd DataLabel="Destination">@context.Destination</MudTd>
-        <MudTd DataLabel="Data Size">@context.DataSize</MudTd>
-        <MudTd DataLabel="Data Preview">@context.DataPreview</MudTd>
+        <MudTd DataLabel="Data Size">@context.Data.Length</MudTd>
+        <MudTd DataLabel="Data Preview">@context.Data.ToHexadecimalString(25)</MudTd>
     </RowTemplate>
 </MudTable>
 
