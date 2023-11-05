@@ -68,6 +68,7 @@ else
         var hexIndexRange = hexadecimalViewModel.Index + DataType.SizeInBytes;
         if (hexIndexRange > _hexadecimals.Count)
         {
+            HandleOnBytesSelected(null);
             return;
         }
 
@@ -77,10 +78,7 @@ else
         }
 
         var selectedHexBytes = _hexadecimals.Where(h => h.IsSelected).ToArray();
-        if (OnBytesSelected.HasDelegate)
-        {
-            OnBytesSelected.InvokeAsync(selectedHexBytes);
-        }
+        HandleOnBytesSelected(selectedHexBytes);
     }
 
     private void ResetByteSelection()
@@ -90,6 +88,14 @@ else
         foreach (var hex in _hexadecimals.Where(hex => hex.IsSelected))
         {
             hex.IsSelected = false;
+        }
+    }
+
+    private void HandleOnBytesSelected(HexadecimalViewModel[] bytes)
+    {
+        if (OnBytesSelected.HasDelegate)
+        {
+            OnBytesSelected.InvokeAsync(bytes);
         }
     }
 
