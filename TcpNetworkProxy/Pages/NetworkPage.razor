@@ -9,7 +9,7 @@
         <NetworkListings NetworkEntries="@Model.GetNetworkEntriesSnapshot()" OnNetworkEntryClicked="@HandleOnClick"/>
     </MudItem>
     <MudItem md="6">
-        <PacketIdentifier SelectedBytes="@_selectedNetworkEntry.Data"/>
+        <PacketIdentifier SelectedNetworkEntry="@_selectedNetworkEntry"/>
     </MudItem>
 </MudGrid>
 

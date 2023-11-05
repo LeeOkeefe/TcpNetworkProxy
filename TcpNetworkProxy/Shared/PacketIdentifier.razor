@@ -6,40 +6,9 @@
             <MudSelectItem Value="@(new DataTypeViewModel { TypeName = nameof(Int32), SizeInBytes = sizeof(int) })"/>
             <MudSelectItem Value="@(new DataTypeViewModel { TypeName = nameof(Int64), SizeInBytes = sizeof(long) })"/>
         </MudSelect>
-        @if (SelectedBytes is not null)
-        {
-            @* <PacketIdentifierToolbar/> *@
-            <MudPaper Elevation="0">
-                @if (_selectedHexBytes is not null)
-                {
-                    <MudGrid>
-                        <MudItem md="2">
-                            <MudButton FullWidth StartIcon="@Icons.Material.Filled.KeyboardDoubleArrowLeft" IconColor="Color.Secondary" Variant="Variant.Text" Color="Color.Primary" Class="py-0">
-                                Shift Left
-                            </MudButton>
-                        </MudItem>
-                        <MudItem md="8">
-                            <MudStack Row Justify="Justify.SpaceEvenly">
-                                <MudText Typo="Typo.button" Align="Align.Center">Little Endian: 41513525325</MudText>
-                                <MudText Typo="Typo.button" Align="Align.Center">Shifted: 0</MudText>
-                                <MudText Typo="Typo.button" Align="Align.Center">Big Endian: 4151</MudText>
-                            </MudStack>
-                        </MudItem>
-                        <MudItem md="2">
-                            <MudButton FullWidth EndIcon="@Icons.Material.Filled.KeyboardDoubleArrowRight" IconColor="Color.Secondary" Variant="Variant.Text" Color="Color.Primary" Class="py-0">
-                                Shift Right
-                            </MudButton>
-                        </MudItem>
-                    </MudGrid>
-                }
-                else
-                {
-                    <MudText>No hexadecimal bytes selected.</MudText>
-                }
-            </MudPaper>
-        }
+        <PacketIdentifierToolbar SelectedNetworkEntry="@SelectedNetworkEntry" SelectedBytes="@_selectedBytes"/>
         <MudDivider Class="my-3"/>
-        <ByteSelector DataType="_selectedDataType" Bytes="@SelectedBytes" OnBytesSelected="@HandleOnBytesSelected"/>
+        <ByteSelector DataType="_selectedDataType" NetworkEntry="@SelectedNetworkEntry" OnBytesSelected="@HandleOnBytesSelected"/>
         @* @if (_selectedHexBytes is not null) *@
         @* { *@
         @*     var bytes = _selectedHexBytes.OrderByDescending(h => h.Index).Select(h => Convert.ToByte(h.Hex, 16)).ToArray(); *@
@@ -59,17 +28,17 @@
 @code {
 
     [Parameter]
-    public byte[] SelectedBytes { get; set; }
+    public NetworkEntryViewModel SelectedNetworkEntry { get; set; }
 
     private DataTypeViewModel _selectedDataType;
 
     Func<DataTypeViewModel, string> _getDataTypeName = dataType => dataType?.TypeName;
 
-    private IReadOnlyCollection<HexadecimalViewModel> _selectedHexBytes;
+    private IReadOnlyCollection<HexadecimalViewModel> _selectedBytes;
 
-    private void HandleOnBytesSelected(IReadOnlyCollection<HexadecimalViewModel> hexBytes)
+    private void HandleOnBytesSelected(IReadOnlyCollection<HexadecimalViewModel> bytes)
     {
-        _selectedHexBytes = hexBytes;
+        _selectedBytes = bytes;
     }
 
 }

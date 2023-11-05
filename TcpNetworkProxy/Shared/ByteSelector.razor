@@ -27,7 +27,7 @@ else
     public DataTypeViewModel DataType { get; set; }
 
     [Parameter]
-    public byte[] Bytes { get; set; }
+    public NetworkEntryViewModel NetworkEntry { get; set; }
 
     private List<HexadecimalViewModel> _hexadecimals = new();
     private int _selectedByteIndex;
@@ -37,12 +37,12 @@ else
     
     protected override void OnParametersSet()
     {
-        if (Bytes is null || _previousHexString == Bytes.ToHexadecimalString() && _previousDataTypeName == DataType?.TypeName)
+        if (NetworkEntry is null || _previousHexString == NetworkEntry.Data.ToHexadecimalString() && _previousDataTypeName == DataType?.TypeName)
         {
             return;
         }
         
-        _hexadecimals = Bytes.Select((b, i) => new HexadecimalViewModel { Index = i, Byte = b, IsSelected = false }).ToList();
+        _hexadecimals = NetworkEntry.Data.Select((b, i) => new HexadecimalViewModel { Index = i, Byte = b, IsSelected = false }).ToList();
 
         if (_selectedByteIndex > _hexadecimals.Count)
         {
@@ -52,7 +52,7 @@ else
         SelectBytes(_hexadecimals[_selectedByteIndex]);
         
         _previousDataTypeName = DataType?.TypeName;
-        _previousHexString = Bytes.ToHexadecimalString();
+        _previousHexString = NetworkEntry.Data.ToHexadecimalString();
     }
 
     private void SelectBytes(HexadecimalViewModel hexadecimalViewModel)

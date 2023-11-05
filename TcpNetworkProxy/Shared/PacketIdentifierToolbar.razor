@@ -1,21 +1,41 @@
-<MudButtonGroup Color="Color.Primary" Variant="Variant.Outlined" Class="mb-4">
-    <MudButton StartIcon="@Icons.Material.Filled.SwapHoriz" IconColor="Color.Secondary">
-        Endianness
-    </MudButton>
-    <MudButton StartIcon="@Icons.Material.Filled.KeyboardDoubleArrowLeft" IconColor="Color.Secondary">
-        Shift left
-    </MudButton>
-    <MudButton StartIcon="@Icons.Material.Filled.KeyboardDoubleArrowRight" IconColor="Color.Secondary">
-        Shift right
-    </MudButton>
-</MudButtonGroup>
+@if (SelectedNetworkEntry is not null)
+{
+    <MudPaper Elevation="0">
+        @if (SelectedBytes is not null)
+        {
+            <MudGrid>
+                <MudItem md="2">
+                    <MudButton FullWidth StartIcon="@Icons.Material.Filled.KeyboardDoubleArrowLeft" IconColor="Color.Secondary" Variant="Variant.Text" Color="Color.Primary" Class="py-0">
+                        Shift Left
+                    </MudButton>
+                </MudItem>
+                <MudItem md="8">
+                    <MudStack Row Justify="Justify.SpaceEvenly">
+                        <MudText Typo="Typo.button" Align="Align.Center">Little Endian: 41513525325</MudText>
+                        <MudText Typo="Typo.button" Align="Align.Center">Shifted: 0</MudText>
+                        <MudText Typo="Typo.button" Align="Align.Center">Big Endian: 4151</MudText>
+                    </MudStack>
+                </MudItem>
+                <MudItem md="2">
+                    <MudButton FullWidth EndIcon="@Icons.Material.Filled.KeyboardDoubleArrowRight" IconColor="Color.Secondary" Variant="Variant.Text" Color="Color.Primary" Class="py-0">
+                        Shift Right
+                    </MudButton>
+                </MudItem>
+            </MudGrid>
+        }
+        else
+        {
+            <MudText>No hexadecimal bytes selected.</MudText>
+        }
+    </MudPaper>
+}
 
 @code {
 
     [Parameter]
-    public IReadOnlyCollection<HexadecimalViewModel> SelectedHexBytes { get; set; }
+    public NetworkEntryViewModel SelectedNetworkEntry { get; set; }
     
     [Parameter]
-    public EventCallback<IReadOnlyCollection<int>> OnHexBytesChanged { get; set; }
+    public IReadOnlyCollection<HexadecimalViewModel> SelectedBytes { get; set; }
 
 }
