@@ -1,17 +1,18 @@
 @using System.ComponentModel
+@using TcpNetworkProxy.Extensions
 
-@if (_hexBytes.Count == 0)
+@if (_hexadecimals.Count == 0)
 {
     <MudText>No network packet selected.</MudText>
 }
 else
 {
     <div class="hex-string">
-        @foreach (var hexByte in _hexBytes)
+        @foreach (var hex in _hexadecimals)
         {
-            <span class="hex-byte @(hexByte.IsSelected ? "highlighted" : string.Empty)"
-                  @onclick="() => SelectBytes(hexByte)">
-                @hexByte.Value
+            <span class="hex-byte @(hex.IsSelected ? "highlighted" : string.Empty)"
+                  @onclick="() => SelectBytes(hex)">
+                @hex.ToString()
             </span>
         }
     </div>
@@ -20,15 +21,15 @@ else
 @code {
 
     [Parameter]
-    public EventCallback<IReadOnlyCollection<HexByteViewModel>> OnHexBytesSelected { get; set; }
+    public EventCallback<IReadOnlyCollection<HexadecimalViewModel>> OnBytesSelected { get; set; }
 
     [Parameter]
     public DataTypeViewModel DataType { get; set; }
 
     [Parameter]
-    public string HexString { get; set; }
+    public byte[] Bytes { get; set; }
 
-    private List<HexByteViewModel> _hexBytes = new();
+    private List<HexadecimalViewModel> _hexadecimals = new();
     private int _selectedByteIndex;
 
     private string _previousDataTypeName;
@@ -36,31 +37,25 @@ else
     
     protected override void OnParametersSet()
     {
-        if (HexString is null || _previousHexString == HexString && _previousDataTypeName == DataType?.TypeName)
+        if (Bytes is null || _previousHexString == Bytes.ToHexadecimalString() && _previousDataTypeName == DataType?.TypeName)
         {
             return;
         }
         
-        _hexBytes = GetHexBytes(HexString);
+        _hexadecimals = Bytes.Select((b, i) => new HexadecimalViewModel { Index = i, Byte = b, IsSelected = false }).ToList();
 
-        if (_selectedByteIndex > _hexBytes.Count)
+        if (_selectedByteIndex > _hexadecimals.Count)
         {
             ResetByteSelection(); 
         }
 
-        SelectBytes(_hexBytes[_selectedByteIndex]);
+        SelectBytes(_hexadecimals[_selectedByteIndex]);
         
         _previousDataTypeName = DataType?.TypeName;
-        _previousHexString = HexString;
+        _previousHexString = Bytes.ToHexadecimalString();
     }
 
-    private List<HexByteViewModel> GetHexBytes(string hexString)
-    {
-        return hexString.Split(" ").Select((h, i) =>
-            new HexByteViewModel { Index = i, Value = h, IsSelected = false }).ToList();
-    }
-
-    private void SelectBytes(HexByteViewModel hexByteViewModel)
+    private void SelectBytes(HexadecimalViewModel hexadecimalViewModel)
     {
         ResetByteSelection();
 
@@ -69,22 +64,22 @@ else
             return;
         }
 
-        _selectedByteIndex = hexByteViewModel.Index;
-        var hexIndexRange = hexByteViewModel.Index + DataType.SizeInBytes;
-        if (hexIndexRange > _hexBytes.Count)
+        _selectedByteIndex = hexadecimalViewModel.Index;
+        var hexIndexRange = hexadecimalViewModel.Index + DataType.SizeInBytes;
+        if (hexIndexRange > _hexadecimals.Count)
         {
             return;
         }
 
-        for (var i = hexByteViewModel.Index; i < hexIndexRange; i++)
+        for (var i = hexadecimalViewModel.Index; i < hexIndexRange; i++)
         {
-            _hexBytes[i].IsSelected = true;
+            _hexadecimals[i].IsSelected = true;
         }
 
-        var selectedHexBytes = _hexBytes.Where(h => h.IsSelected).ToArray();
-        if (OnHexBytesSelected.HasDelegate)
+        var selectedHexBytes = _hexadecimals.Where(h => h.IsSelected).ToArray();
+        if (OnBytesSelected.HasDelegate)
         {
-            OnHexBytesSelected.InvokeAsync(selectedHexBytes);
+            OnBytesSelected.InvokeAsync(selectedHexBytes);
         }
     }
 
@@ -92,7 +87,7 @@ else
     {
         _selectedByteIndex = 0;
 
-        foreach (var hex in _hexBytes.Where(hex => hex.IsSelected))
+        foreach (var hex in _hexadecimals.Where(hex => hex.IsSelected))
         {
             hex.IsSelected = false;
         }

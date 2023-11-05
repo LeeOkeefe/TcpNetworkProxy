@@ -6,7 +6,7 @@
             <MudSelectItem Value="@(new DataTypeViewModel { TypeName = nameof(Int32), SizeInBytes = sizeof(int) })"/>
             <MudSelectItem Value="@(new DataTypeViewModel { TypeName = nameof(Int64), SizeInBytes = sizeof(long) })"/>
         </MudSelect>
-        @if (HexString is not null)
+        @if (SelectedBytes is not null)
         {
             @* <PacketIdentifierToolbar/> *@
             <MudPaper Elevation="0">
@@ -39,7 +39,7 @@
             </MudPaper>
         }
         <MudDivider Class="my-3"/>
-        <ByteSelector DataType="_selectedDataType" HexString="@HexString" OnHexBytesSelected="@HandleOnHexBytesSelected"/>
+        <ByteSelector DataType="_selectedDataType" Bytes="@SelectedBytes" OnBytesSelected="@HandleOnBytesSelected"/>
         @* @if (_selectedHexBytes is not null) *@
         @* { *@
         @*     var bytes = _selectedHexBytes.OrderByDescending(h => h.Index).Select(h => Convert.ToByte(h.Hex, 16)).ToArray(); *@
@@ -59,15 +59,15 @@
 @code {
 
     [Parameter]
-    public string HexString { get; set; }
+    public byte[] SelectedBytes { get; set; }
 
     private DataTypeViewModel _selectedDataType;
 
     Func<DataTypeViewModel, string> _getDataTypeName = dataType => dataType?.TypeName;
 
-    private IReadOnlyCollection<HexByteViewModel> _selectedHexBytes;
+    private IReadOnlyCollection<HexadecimalViewModel> _selectedHexBytes;
 
-    private void HandleOnHexBytesSelected(IReadOnlyCollection<HexByteViewModel> hexBytes)
+    private void HandleOnBytesSelected(IReadOnlyCollection<HexadecimalViewModel> hexBytes)
     {
         _selectedHexBytes = hexBytes;
     }

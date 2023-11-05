@@ -8,6 +8,6 @@ public static class ArrayExtensions
             ? bytes 
             : bytes[..bytesLength.Value];
         
-        return bytes is null ? null : string.Join(delimiter, bytesToConvert.Select(d => $"{d:X}"));
+        return bytes is null ? null : string.Join(delimiter, bytesToConvert.Select(b => $"{b:X2}"));
     }
 }
