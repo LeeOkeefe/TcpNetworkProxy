@@ -11,9 +11,9 @@
                 </MudItem>
                 <MudItem md="8">
                     <MudStack Row Justify="Justify.SpaceEvenly">
-                        <MudText Typo="Typo.button" Align="Align.Center">Little Endian: 41513525325</MudText>
+                        <MudText Typo="Typo.button" Align="Align.Center">Little Endian: @GetEndian().little</MudText>
                         <MudText Typo="Typo.button" Align="Align.Center">Shifted: 0</MudText>
-                        <MudText Typo="Typo.button" Align="Align.Center">Big Endian: 4151</MudText>
+                        <MudText Typo="Typo.button" Align="Align.Center">Big Endian: @GetEndian().big</MudText>
                     </MudStack>
                 </MudItem>
                 <MudItem md="2">
@@ -40,4 +40,46 @@
     
     [Parameter]
     public IReadOnlyCollection<HexadecimalViewModel> SelectedBytes { get; set; }
+
+    private NetworkEntryViewModel _previousNetworkEntry;
+    private IReadOnlyCollection<HexadecimalViewModel> _previousBytes;
+
+    protected override void OnParametersSet()
+    {
+        if (SelectedNetworkEntry != _previousNetworkEntry || !Equals(SelectedBytes, _previousBytes))
+        {
+            StateHasChanged();
+        }
+        base.OnParametersSet();
+    }
+
+    private (string little, string big) GetEndian()
+    {
+        var bytesToConvert = GetOrderedBytes();
+
+        var bytes = ConvertBytes(bytesToConvert, SelectedDataType.Type);
+        var bytesReversed = ConvertBytes(bytesToConvert.Reverse().ToArray(), SelectedDataType.Type);
+        
+        return BitConverter.IsLittleEndian ? (bytes, bytesReversed) : (bytesReversed, bytes);
+    }
+
+    private byte[] GetOrderedBytes()
+    {
+        return SelectedBytes
+            .OrderBy(b => b.Index)
+            .Select(b => b.Byte)
+            .ToArray();
+    }
+
+    private string ConvertBytes(byte[] bytes, Type type)
+    {
+        return Type.GetTypeCode(type) switch
+        {
+            TypeCode.Int32 when bytes.Length >= sizeof(int) => BitConverter.ToInt32(bytes).ToString(),
+            TypeCode.Int64 when bytes.Length >= sizeof(long) => BitConverter.ToInt64(bytes).ToString(),
+            TypeCode.Int16 when bytes.Length >= sizeof(short) => BitConverter.ToInt16(bytes).ToString(),
+            TypeCode.Byte when bytes.Length >= 1 => bytes[0].ToString(),
+            _ => string.Empty
+        };
+    }
 }
