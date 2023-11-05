@@ -1,0 +1,24 @@
+<MudCard>
+    <MudCardContent>
+        <MudSelect T="DataTypeViewModel" @bind-Value="@_selectedDataType" ToStringFunc="@_getDataTypeName" Label="Select data type" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Outlined" Class="my-5">
+            <MudSelectItem Value="@(new DataTypeViewModel { TypeName = nameof(Byte), SizeInBytes = sizeof(byte) })" />
+            <MudSelectItem Value="@(new DataTypeViewModel { TypeName = nameof(Int16), SizeInBytes = sizeof(short) })" />
+            <MudSelectItem Value="@(new DataTypeViewModel { TypeName = nameof(Int32), SizeInBytes = sizeof(int) })" />
+            <MudSelectItem Value="@(new DataTypeViewModel { TypeName = nameof(Int64), SizeInBytes = sizeof(long) })" />
+        </MudSelect>
+        @if (HexString is not null)
+        {
+            <PacketIdentifierToolbar/>
+        }
+        <ByteSelector DataType="_selectedDataType" HexString="@HexString"/>
+    </MudCardContent>
+</MudCard>
+
+@code {
+    [Parameter]
+    public string HexString { get; set; }
+
+    private DataTypeViewModel _selectedDataType;
+    
+    Func<DataTypeViewModel, string> _getDataTypeName = dataType => dataType?.TypeName;
+}

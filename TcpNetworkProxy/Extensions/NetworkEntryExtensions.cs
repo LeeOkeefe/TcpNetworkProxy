@@ -12,7 +12,7 @@ public static class NetworkEntryExtensions
             Timestamp = entry.Timestamp,
             Source = entry.Source,
             Destination = entry.Destination,
-            Data = entry.Data
+            Data = entry.Data.Replace("-", " ")
         };
     }
 }

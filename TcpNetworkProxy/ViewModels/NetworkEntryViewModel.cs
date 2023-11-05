@@ -12,7 +12,7 @@ public sealed class NetworkEntryViewModel
     [Hexadecimal]
     public string Data { get; set; }
 
-    public int DataSize => Data.Split("-").Length;
+    public int DataSize => Data.Split(" ").Length;
 
     private const int BytesPerPreview = 20;
     public string DataPreview
