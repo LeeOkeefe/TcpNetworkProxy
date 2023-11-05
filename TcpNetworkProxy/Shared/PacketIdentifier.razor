@@ -7,7 +7,7 @@
             <MudSelectItem Value="@(new DataTypeViewModel { Type = typeof(long), SizeInBytes = sizeof(long) })"/>
         </MudSelect>
         <PacketIdentifierToolbar SelectedNetworkEntry="@SelectedNetworkEntry" SelectedDataType="@_selectedDataType" SelectedBytes="@_selectedBytes"/>
-        <MudDivider Class="my-3"/>
+        <MudDivider Class="my-4"/>
         <ByteSelector DataType="_selectedDataType" NetworkEntry="@SelectedNetworkEntry" OnBytesSelected="@HandleOnBytesSelected"/>
     </MudCardContent>
 </MudCard>
