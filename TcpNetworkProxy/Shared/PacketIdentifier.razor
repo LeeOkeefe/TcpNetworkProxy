@@ -1,24 +1,75 @@
 <MudCard>
     <MudCardContent>
         <MudSelect T="DataTypeViewModel" @bind-Value="@_selectedDataType" ToStringFunc="@_getDataTypeName" Label="Select data type" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Outlined" Class="my-5">
-            <MudSelectItem Value="@(new DataTypeViewModel { TypeName = nameof(Byte), SizeInBytes = sizeof(byte) })" />
-            <MudSelectItem Value="@(new DataTypeViewModel { TypeName = nameof(Int16), SizeInBytes = sizeof(short) })" />
-            <MudSelectItem Value="@(new DataTypeViewModel { TypeName = nameof(Int32), SizeInBytes = sizeof(int) })" />
-            <MudSelectItem Value="@(new DataTypeViewModel { TypeName = nameof(Int64), SizeInBytes = sizeof(long) })" />
+            <MudSelectItem Value="@(new DataTypeViewModel { TypeName = nameof(Byte), SizeInBytes = sizeof(byte) })"/>
+            <MudSelectItem Value="@(new DataTypeViewModel { TypeName = nameof(Int16), SizeInBytes = sizeof(short) })"/>
+            <MudSelectItem Value="@(new DataTypeViewModel { TypeName = nameof(Int32), SizeInBytes = sizeof(int) })"/>
+            <MudSelectItem Value="@(new DataTypeViewModel { TypeName = nameof(Int64), SizeInBytes = sizeof(long) })"/>
         </MudSelect>
         @if (HexString is not null)
         {
-            <PacketIdentifierToolbar/>
+            @* <PacketIdentifierToolbar/> *@
+            <MudPaper Elevation="0">
+                @if (_selectedHexBytes is not null)
+                {
+                    <MudGrid>
+                        <MudItem md="2">
+                            <MudButton FullWidth StartIcon="@Icons.Material.Filled.KeyboardDoubleArrowLeft" IconColor="Color.Secondary" Variant="Variant.Text" Color="Color.Primary" Class="py-0">
+                                Shift Left
+                            </MudButton>
+                        </MudItem>
+                        <MudItem md="8">
+                            <MudStack Row Justify="Justify.SpaceEvenly">
+                                <MudText Typo="Typo.button" Align="Align.Center">Little Endian: 41513525325</MudText>
+                                <MudText Typo="Typo.button" Align="Align.Center">Shifted: 0</MudText>
+                                <MudText Typo="Typo.button" Align="Align.Center">Big Endian: 4151</MudText>
+                            </MudStack>
+                        </MudItem>
+                        <MudItem md="2">
+                            <MudButton FullWidth EndIcon="@Icons.Material.Filled.KeyboardDoubleArrowRight" IconColor="Color.Secondary" Variant="Variant.Text" Color="Color.Primary" Class="py-0">
+                                Shift Right
+                            </MudButton>
+                        </MudItem>
+                    </MudGrid>
+                }
+                else
+                {
+                    <MudText>No hexadecimal bytes selected.</MudText>
+                }
+            </MudPaper>
         }
-        <ByteSelector DataType="_selectedDataType" HexString="@HexString"/>
+        <MudDivider Class="my-3"/>
+        <ByteSelector DataType="_selectedDataType" HexString="@HexString" OnHexBytesSelected="@HandleOnHexBytesSelected"/>
+        @* @if (_selectedHexBytes is not null) *@
+        @* { *@
+        @*     var bytes = _selectedHexBytes.OrderByDescending(h => h.Index).Select(h => Convert.ToByte(h.Hex, 16)).ToArray(); *@
+        @*     @foreach (var hex in bytes) *@
+        @*     { *@
+        @*         <span class="hex-byte"> *@
+        @*             @hex *@
+        @*         </span> *@
+        @*     } *@
+        @*     <p>Big endian int: @BitConverter.ToInt32(bytes)</p> *@
+        @*     <p>Little endian int: @BitConverter.ToInt32(bytes.Reverse().ToArray())</p> *@
+        @*     <p>Is system Little Endian: @BitConverter.IsLittleEndian</p> *@
+        @* } *@
     </MudCardContent>
 </MudCard>
 
 @code {
+
     [Parameter]
     public string HexString { get; set; }
 
     private DataTypeViewModel _selectedDataType;
-    
+
     Func<DataTypeViewModel, string> _getDataTypeName = dataType => dataType?.TypeName;
+
+    private IReadOnlyCollection<HexByteViewModel> _selectedHexBytes;
+
+    private void HandleOnHexBytesSelected(IReadOnlyCollection<HexByteViewModel> hexBytes)
+    {
+        _selectedHexBytes = hexBytes;
+    }
+
 }

@@ -2,7 +2,7 @@
 
 @if (_hexBytes.Count == 0)
 {
-    <MudText>No packet selected.</MudText>
+    <MudText>No network packet selected.</MudText>
 }
 else
 {
@@ -20,6 +20,9 @@ else
 @code {
 
     [Parameter]
+    public EventCallback<IReadOnlyCollection<HexByteViewModel>> OnHexBytesSelected { get; set; }
+
+    [Parameter]
     public DataTypeViewModel DataType { get; set; }
 
     [Parameter]
@@ -28,21 +31,27 @@ else
     private List<HexByteViewModel> _hexBytes = new();
     private int _selectedByteIndex;
 
+    private string _previousDataTypeName;
+    private string _previousHexString;
+    
     protected override void OnParametersSet()
     {
-        if (HexString is null)
+        if (HexString is null || _previousHexString == HexString && _previousDataTypeName == DataType?.TypeName)
         {
             return;
         }
+        
+        _hexBytes = GetHexBytes(HexString);
 
-        if (_selectedByteIndex < _hexBytes.Count | _selectedByteIndex > _hexBytes.Count)
+        if (_selectedByteIndex > _hexBytes.Count)
         {
             ResetByteSelection(); 
         }
 
-        _hexBytes = GetHexBytes(HexString);
-        var bytes = _hexBytes[_selectedByteIndex];
-        SelectBytes(bytes);
+        SelectBytes(_hexBytes[_selectedByteIndex]);
+        
+        _previousDataTypeName = DataType?.TypeName;
+        _previousHexString = HexString;
     }
 
     private List<HexByteViewModel> GetHexBytes(string hexString)
@@ -70,6 +79,12 @@ else
         for (var i = hexByteViewModel.Index; i < hexIndexRange; i++)
         {
             _hexBytes[i].IsSelected = true;
+        }
+
+        var selectedHexBytes = _hexBytes.Where(h => h.IsSelected).ToArray();
+        if (OnHexBytesSelected.HasDelegate)
+        {
+            OnHexBytesSelected.InvokeAsync(selectedHexBytes);
         }
     }
 

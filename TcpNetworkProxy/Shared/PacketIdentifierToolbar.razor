@@ -9,3 +9,13 @@
         Shift right
     </MudButton>
 </MudButtonGroup>
+
+@code {
+
+    [Parameter]
+    public IReadOnlyCollection<HexByteViewModel> SelectedHexBytes { get; set; }
+    
+    [Parameter]
+    public EventCallback<IReadOnlyCollection<int>> OnHexBytesChanged { get; set; }
+
+}
