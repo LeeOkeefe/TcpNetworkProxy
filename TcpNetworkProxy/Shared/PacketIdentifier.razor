@@ -1,27 +1,14 @@
 <MudCard>
     <MudCardContent>
         <MudSelect T="DataTypeViewModel" @bind-Value="@_selectedDataType" ToStringFunc="@_getDataTypeName" Label="Select data type" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Outlined" Class="my-5">
-            <MudSelectItem Value="@(new DataTypeViewModel { TypeName = nameof(Byte), SizeInBytes = sizeof(byte) })"/>
-            <MudSelectItem Value="@(new DataTypeViewModel { TypeName = nameof(Int16), SizeInBytes = sizeof(short) })"/>
-            <MudSelectItem Value="@(new DataTypeViewModel { TypeName = nameof(Int32), SizeInBytes = sizeof(int) })"/>
-            <MudSelectItem Value="@(new DataTypeViewModel { TypeName = nameof(Int64), SizeInBytes = sizeof(long) })"/>
+            <MudSelectItem Value="@(new DataTypeViewModel { Type = typeof(byte), SizeInBytes = sizeof(byte) })"/>
+            <MudSelectItem Value="@(new DataTypeViewModel { Type = typeof(short), SizeInBytes = sizeof(short) })"/>
+            <MudSelectItem Value="@(new DataTypeViewModel { Type = typeof(int), SizeInBytes = sizeof(int) })"/>
+            <MudSelectItem Value="@(new DataTypeViewModel { Type = typeof(long), SizeInBytes = sizeof(long) })"/>
         </MudSelect>
-        <PacketIdentifierToolbar SelectedNetworkEntry="@SelectedNetworkEntry" SelectedBytes="@_selectedBytes"/>
+        <PacketIdentifierToolbar SelectedNetworkEntry="@SelectedNetworkEntry" SelectedDataType="@_selectedDataType" SelectedBytes="@_selectedBytes"/>
         <MudDivider Class="my-3"/>
         <ByteSelector DataType="_selectedDataType" NetworkEntry="@SelectedNetworkEntry" OnBytesSelected="@HandleOnBytesSelected"/>
-        @* @if (_selectedHexBytes is not null) *@
-        @* { *@
-        @*     var bytes = _selectedHexBytes.OrderByDescending(h => h.Index).Select(h => Convert.ToByte(h.Hex, 16)).ToArray(); *@
-        @*     @foreach (var hex in bytes) *@
-        @*     { *@
-        @*         <span class="hex-byte"> *@
-        @*             @hex *@
-        @*         </span> *@
-        @*     } *@
-        @*     <p>Big endian int: @BitConverter.ToInt32(bytes)</p> *@
-        @*     <p>Little endian int: @BitConverter.ToInt32(bytes.Reverse().ToArray())</p> *@
-        @*     <p>Is system Little Endian: @BitConverter.IsLittleEndian</p> *@
-        @* } *@
     </MudCardContent>
 </MudCard>
 
@@ -32,7 +19,7 @@
 
     private DataTypeViewModel _selectedDataType;
 
-    Func<DataTypeViewModel, string> _getDataTypeName = dataType => dataType?.TypeName;
+    Func<DataTypeViewModel, string> _getDataTypeName = dataType => dataType?.Type.Name;
 
     private IReadOnlyCollection<HexadecimalViewModel> _selectedBytes;
 

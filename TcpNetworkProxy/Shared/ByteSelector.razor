@@ -1,7 +1,7 @@
 @using System.ComponentModel
 @using TcpNetworkProxy.Extensions
 
-@if (_hexadecimals.Count == 0)
+@if (NetworkEntry is null)
 {
     <MudText>No network packet selected.</MudText>
 }
@@ -32,12 +32,12 @@ else
     private List<HexadecimalViewModel> _hexadecimals = new();
     private int _selectedByteIndex;
 
-    private string _previousDataTypeName;
+    private Type _previousDataType;
     private string _previousHexString;
     
     protected override void OnParametersSet()
     {
-        if (NetworkEntry is null || _previousHexString == NetworkEntry.Data.ToHexadecimalString() && _previousDataTypeName == DataType?.TypeName)
+        if (NetworkEntry is null || _previousHexString == NetworkEntry.Data.ToHexadecimalString() && _previousDataType == DataType?.Type)
         {
             return;
         }
@@ -51,7 +51,7 @@ else
 
         SelectBytes(_hexadecimals[_selectedByteIndex]);
         
-        _previousDataTypeName = DataType?.TypeName;
+        _previousDataType = DataType?.Type;
         _previousHexString = NetworkEntry.Data.ToHexadecimalString();
     }
 

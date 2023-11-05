@@ -19,7 +19,7 @@
     [Parameter] public string DestinationHost { get; set; }
     [Parameter] public int DestinationPort { get; set; }
 
-    private NetworkEntryViewModel _selectedNetworkEntry = new();
+    private NetworkEntryViewModel _selectedNetworkEntry;
     
     protected override void OnInitialized()
     {

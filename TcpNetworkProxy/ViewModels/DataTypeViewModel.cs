@@ -2,13 +2,13 @@ namespace TcpNetworkProxy.ViewModels;
 
 public class DataTypeViewModel
 {
-    public string TypeName { get; set; }
+    public Type Type { get; set; }
     public int SizeInBytes { get; set; }
     
     public override bool Equals(object o) {
         var other = o as DataTypeViewModel;
-        return other?.TypeName == TypeName;
+        return other?.Type == Type;
     }
     
-    public override int GetHashCode() => TypeName.GetHashCode();
+    public override int GetHashCode() => Type.GetHashCode();
 }
