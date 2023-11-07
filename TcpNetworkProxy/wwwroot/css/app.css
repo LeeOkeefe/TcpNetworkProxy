@@ -9,3 +9,15 @@
 .selected > td .mud-input {
     color: white !important;
 }
+
+.mud-table-container {
+    height: 60vh !important;
+}
+
+.mud-input.mud-input-underline:before {
+    margin-right: 50% !important; 
+}
+
+.mud-input.mud-input-underline:after {
+    margin-right: 50% !important;
+}
