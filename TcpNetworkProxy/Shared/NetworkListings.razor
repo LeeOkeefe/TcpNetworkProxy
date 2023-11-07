@@ -5,8 +5,7 @@
 @inject IJSRuntime JsRuntime
 
 <MudTable Items="@NetworkEntries" OnRowClick="@OnNetworkEntryClicked" RowClassFunc="@SelectedRowClassFunc"
-          @ref="_mudTable" RowClass="cursor-pointer" Height="650px"
-          Virtualize Hover Dense FixedHeader>
+          @ref="_mudTable" RowClass="cursor-pointer" Virtualize Hover Dense FixedHeader>
     <ColGroup>
         <col style="width: 10%"/>
         <col style="width: 10%"/>

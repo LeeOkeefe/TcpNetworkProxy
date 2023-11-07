@@ -1,4 +1,4 @@
-<MudCard>
+<MudCard Style="height: 100%">
     <MudCardContent>
         <MudSelect T="DataTypeViewModel" @bind-Value="@_selectedDataType" ToStringFunc="@_getDataTypeName" Label="Select data type" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Outlined" Class="my-5">
             <MudSelectItem Value="@(new DataTypeViewModel { Type = typeof(byte), SizeInBytes = sizeof(byte) })"/>
