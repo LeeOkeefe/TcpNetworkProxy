@@ -1,8 +1,11 @@
 @using TcpNetworkProxy.Validators
 @using System.Globalization
 @using TcpNetworkProxy.Extensions
+
 <MudCard Style="height: 100%">
     <MudCardContent>
+        <PacketEditorToolbar SelectedNetworkEntry="@SelectedNetworkEntry" ModifiedBytes="@ModifiedBytes" OnResetPacket="@InitializeModifiableBytes" OnSendPacket="@HandleOnSendPacket" />
+        <MudDivider Class="my-4"/>
         @if (SelectedNetworkEntry?.Data is not null)
         {
             @for (var i = 0; i < ModifiedBytes.Length; i++)
@@ -14,7 +17,7 @@
                     InputType="InputType.Text"
                     Adornment="Adornment.None"
                     MaxLength="2"
-                    TextChanged="@((hex) => HandleOnChange(hex, index))"
+                    TextChanged="@(hex => HandleOnChange(hex, index))"
                     Error="@(!_hexValidator.IsValid(ModifiedBytesAsHexStrings[index]))"
                     Style="width: 4ch; font-size: .875rem"/>
             }
@@ -38,8 +41,7 @@
     {
         if (!Equals(SelectedNetworkEntry, _previousNetworkEntry))
         {
-            ModifiedBytes = SelectedNetworkEntry.Data.ToArray();
-            ModifiedBytesAsHexStrings = ModifiedBytes.ToHexadecimalString(delimiter: " ").Split(" ");
+            InitializeModifiableBytes();
             _previousNetworkEntry = SelectedNetworkEntry;
         }
         base.OnParametersSet();
@@ -53,5 +55,16 @@
             ModifiedBytes[i] = Convert.ToByte(hex, 16);
         }
     }
-    
+
+    private void InitializeModifiableBytes()
+    {
+        ModifiedBytes = SelectedNetworkEntry.Data.ToArray();
+        ModifiedBytesAsHexStrings = SelectedNetworkEntry.Data.ToHexadecimalString(delimiter: " ").Split(" ");
+    }
+
+    private void HandleOnSendPacket()
+    {
+        
+    }
+
 }
