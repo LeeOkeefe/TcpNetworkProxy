@@ -1,0 +1,43 @@
+@if (SelectedNetworkEntry is not null)
+{
+    <MudPaper Elevation="0">
+        @if (ModifiedBytes is not null)
+        {
+            <MudGrid>
+                <MudItem md="2">
+                    <MudButton FullWidth StartIcon="@Icons.Material.Filled.Refresh"
+                               IconColor="Color.Secondary" Variant="Variant.Text" Color="Color.Primary" Class="py-0" OnClick="@OnResetPacket">
+                        Reset
+                    </MudButton>
+                </MudItem>
+                <MudItem md="8">
+                    <MudStack Row Justify="Justify.SpaceEvenly">
+                        <MudText Typo="Typo.button" Align="Align.Center">Source: @SelectedNetworkEntry.Source</MudText>
+                        <MudText Typo="Typo.button" Align="Align.Center">Destination: @SelectedNetworkEntry.Destination</MudText>
+                    </MudStack>
+                </MudItem>
+                <MudItem md="2">
+                    <MudButton FullWidth EndIcon="@Icons.Material.Filled.Send"
+                               IconColor="Color.Secondary" Variant="Variant.Text" Color="Color.Primary" Class="py-0" OnClick="@OnSendPacket">
+                        Send
+                    </MudButton>
+                </MudItem>
+            </MudGrid>
+        }
+    </MudPaper>
+}
+
+@code {
+
+    [Parameter]
+    public NetworkEntryViewModel SelectedNetworkEntry { get; set; }
+    
+    [Parameter]
+    public byte[] ModifiedBytes { get; set; }
+    
+    [Parameter]
+    public EventCallback OnResetPacket { get; set; }
+    
+    [Parameter]
+    public EventCallback OnSendPacket { get; set; }
+}

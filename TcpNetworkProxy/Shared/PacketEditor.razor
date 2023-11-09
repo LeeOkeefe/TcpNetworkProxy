@@ -1,0 +1,73 @@
+@using TcpNetworkProxy.Validators
+@using System.Globalization
+@using TcpNetworkProxy.Extensions
+
+@inject ProxyService ProxyService
+
+<MudCard Style="height: 100%">
+    <MudCardContent>
+        <PacketEditorToolbar SelectedNetworkEntry="@SelectedNetworkEntry" ModifiedBytes="@ModifiedBytes" OnResetPacket="@InitializeModifiableBytes" OnSendPacket="@HandleOnSendPacket" />
+        <MudDivider Class="my-4"/>
+        @if (SelectedNetworkEntry?.Data is not null)
+        {
+            @for (var i = 0; i < ModifiedBytes.Length; i++)
+            {
+                var index = i;
+                <MudInput
+                    T="string"
+                    Value="ModifiedBytesAsHexStrings[index]"
+                    InputType="InputType.Text"
+                    Adornment="Adornment.None"
+                    MaxLength="2"
+                    TextChanged="@(hex => HandleOnChange(hex, index))"
+                    Error="@(!_hexValidator.IsValid(ModifiedBytesAsHexStrings[index]))"
+                    Style="width: 4ch; font-size: .875rem"/>
+            }
+        }
+    </MudCardContent>
+</MudCard>
+
+@code {
+
+    [Parameter]
+    public NetworkEntryViewModel SelectedNetworkEntry { get; set; }
+    
+    private NetworkEntryViewModel _previousNetworkEntry;
+    
+    private byte[] ModifiedBytes { get; set; }
+    private string[] ModifiedBytesAsHexStrings { get; set; }
+
+    private HexadecimalAttribute _hexValidator = new();
+    
+    protected override void OnParametersSet()
+    {
+        if (!Equals(SelectedNetworkEntry, _previousNetworkEntry))
+        {
+            InitializeModifiableBytes();
+            _previousNetworkEntry = SelectedNetworkEntry;
+        }
+        base.OnParametersSet();
+    }
+
+    private void HandleOnChange(string hex, int i)
+    {
+        ModifiedBytesAsHexStrings[i] = hex;
+        if (_hexValidator.IsValid(hex))
+        {
+            ModifiedBytes[i] = Convert.ToByte(hex, 16);
+        }
+    }
+
+    private void InitializeModifiableBytes()
+    {
+        ModifiedBytes = SelectedNetworkEntry.Data.ToArray();
+        ModifiedBytesAsHexStrings = SelectedNetworkEntry.Data.ToHexadecimalString(delimiter: " ").Split(" ");
+    }
+
+    private async Task HandleOnSendPacket()
+    {
+        var entry = new NetworkEntry(TimeOnly.FromDateTime(DateTime.Now), SelectedNetworkEntry.Source, SelectedNetworkEntry.Destination, SelectedNetworkEntry.Data);
+        await ProxyService.SendCustomNetworkEntry(entry);
+    }
+
+}
