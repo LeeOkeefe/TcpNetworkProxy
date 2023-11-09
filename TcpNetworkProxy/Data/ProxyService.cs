@@ -9,6 +9,9 @@ public sealed class ProxyService
 
     private readonly CancellationTokenSource _cts = new();
 
+    private TcpClient _incomingClient;
+    private TcpClient _outgoingClient;
+    
     private Connection _proxy;
     private Connection _destination;
     
@@ -22,15 +25,27 @@ public sealed class ProxyService
 
         while (!_cts.IsCancellationRequested)
         {
-            var incomingClient = await listener.AcceptTcpClientAsync();
-            var outgoingClient = new TcpClient(destination.Host, destination.Port);
+            _incomingClient = await listener.AcceptTcpClientAsync();
+            _outgoingClient = new TcpClient(destination.Host, destination.Port);
             
-            _ = Task.Run(() => HandleClientAsync(incomingClient, outgoingClient));
+            _ = Task.Run(() => HandleClientAsync(_incomingClient, _outgoingClient));
         }
         
         listener.Stop();
     }
 
+    public async Task SendCustomNetworkEntry(NetworkEntry networkEntry)
+    {
+        var targetStream = networkEntry.Destination == _destination.Host
+            ? _outgoingClient.GetStream()
+            : _incomingClient.GetStream();
+        
+        await targetStream.WriteAsync(networkEntry.Data);
+        await targetStream.FlushAsync();
+            
+        OnNetworkDataSent?.Invoke(networkEntry);
+    }
+    
     private async Task HandleClientAsync(TcpClient incomingClient, TcpClient outgoingClient)
     {
         await using var incomingStream = incomingClient.GetStream();
@@ -41,7 +56,7 @@ public sealed class ProxyService
         
         await Task.WhenAll(incomingToOutgoing, outgoingToIncoming);
     }
-    
+
     private async Task ForwardDataAsync(Stream fromStream, Stream toStream, Connection source, Connection destination)
     {
         var buffer = new byte[1024];
@@ -54,9 +69,9 @@ public sealed class ProxyService
 
             var data = new byte[bytesRead];
             Array.Copy(buffer, data, bytesRead);
-            
+
             var entry = new NetworkEntry(TimeOnly.FromDateTime(DateTime.Now), source.Host, destination.Host, data);
-            
+
             OnNetworkDataSent?.Invoke(entry);
         }
     }

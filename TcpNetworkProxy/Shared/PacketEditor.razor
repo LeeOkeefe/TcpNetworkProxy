@@ -2,6 +2,8 @@
 @using System.Globalization
 @using TcpNetworkProxy.Extensions
 
+@inject ProxyService ProxyService
+
 <MudCard Style="height: 100%">
     <MudCardContent>
         <PacketEditorToolbar SelectedNetworkEntry="@SelectedNetworkEntry" ModifiedBytes="@ModifiedBytes" OnResetPacket="@InitializeModifiableBytes" OnSendPacket="@HandleOnSendPacket" />
@@ -62,9 +64,10 @@
         ModifiedBytesAsHexStrings = SelectedNetworkEntry.Data.ToHexadecimalString(delimiter: " ").Split(" ");
     }
 
-    private void HandleOnSendPacket()
+    private async Task HandleOnSendPacket()
     {
-        
+        var entry = new NetworkEntry(TimeOnly.FromDateTime(DateTime.Now), SelectedNetworkEntry.Source, SelectedNetworkEntry.Destination, SelectedNetworkEntry.Data);
+        await ProxyService.SendCustomNetworkEntry(entry);
     }
 
 }
