@@ -66,7 +66,7 @@ else
 
         _selectedByteIndex = hexadecimalViewModel.Index;
         var hexIndexRange = hexadecimalViewModel.Index + DataType.SizeInBytes;
-        if (hexIndexRange > _hexadecimals.Count)
+        if (hexIndexRange > _hexadecimals.Count || DataType.Type == typeof(char))
         {
             HandleOnBytesSelected(null);
             return;
